@@ -51,6 +51,7 @@ for i in range(t-1):
     y.append(Nu.calc(I))
 
 plt.plot(x,y,label='Test')
+plt.savefig('MLNeuron.png')
 #print(y)
 
 #%%n-Vgraph
@@ -67,3 +68,4 @@ for i in range(t):
     sim_n.append(sim_neuron.get_n())
 
 plt.plot(sim_V,sim_n,label='n-V')
+plt.savefig('MLNeuron-nV.png')

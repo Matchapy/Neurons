@@ -32,3 +32,4 @@ for i in range(t-1):
 #print(y)
 
 plt.plot(x,y,label='Test')
+plt.savefig('積分発火型.png')

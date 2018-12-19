@@ -62,6 +62,6 @@ for i in range(t-1):
     #print(Nu.get_params())
 
 plt.plot(x,y,label='Test')
-
+plt.savefig('Hudgkin-Huxley.png')
 fig=plt.figure()
 #print(y)
