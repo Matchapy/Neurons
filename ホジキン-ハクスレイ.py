@@ -50,8 +50,8 @@ class Neuron:
 #tは時間、Iは電流値[mA]
 
 t = 2000
-I = 100
-Nu=Neuron(-40)
+I = 200
+Nu=Neuron(-30)
 
 x = np.linspace(0,t,t)
 y= []
