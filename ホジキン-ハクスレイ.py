@@ -51,7 +51,7 @@ class Neuron:
 
 t = 2000
 I = 100
-Nu=Neuron(-50)
+Nu=Neuron(-40)
 
 x = np.linspace(0,t,t)
 y= []
