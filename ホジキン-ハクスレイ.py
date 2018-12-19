@@ -22,24 +22,27 @@ class Neuron:
     n=0
     delta_t=0.01
 
-
-
     def __init__(self,V0):
         self.V=V0
 
     def calc(self,I):
+        #計算部分
         alp_m=0.1*(40+self.V)/(1-np.exp(-(40+self.V)/10))
         beta_m=4*np.exp(-(self.V+65)/18)
         alp_h=0.07*np.exp(-(self.V+65)/20)
         beta_h=1/(1+np.exp(-(self.V+35)/10))
-        
-        m_next=(0.1*(40+self.V)/(1-np.exp(-(40+self.V)/10))*(1-self.m)-4*np.exp(-1*(self.V+65)/18)*self.m)*self.delta_t+self.m
-        h_next=(0.07*np.exp(-1*(self.V+65)/20)*(1-self.h)-1/(np.exp((-35-self.V)/10)+1)*self.h)*self.delta_t+self.h
-        n_next=(0.01*(55+self.V)/(1-np.exp(-1*(55+self.V)/10))*(1-self.n)-0.125*np.exp(-1*(self.V+65)/80)*self.n)*self.delta_t+self.n
+        alp_n=0.01*(self.V+55)/(1-np.exp(-(self.V+55)/10))
+        beta_n=0.125*np.exp(-(self.V+65)/80)
+
+        m_next=(alp_m*(1-self.m)-beta_m*self.m)*self.delta_t+self.m
+        h_next=(alp_h*(1-self.h)-beta_h*self.h)*self.delta_t+self.h
+        n_next=(alp_n*(1-self.n)-beta_n*self.n)*self.delta_t+self.n
+
         self.INa=self.gNa*(self.m**3)*self.h*(self.V-self.ENa)
         self.Ik=self.gk*(self.n**4)*(self.V-self.Ek)
         self.IL=self.gL*(self.V-self.EL)
         V_next=((-1*(self.INa+self.Ik+self.IL)+I)/self.C)*self.delta_t+self.V
+
         self.m=m_next
         self.h=h_next
         self.n=n_next
@@ -59,8 +62,8 @@ class Neuron:
 #シミュレート設定
 #tは時間、Iは電流値[mA]
 
-t = 4000
-I = 100
+t = 2000
+I = 80
 Nu=Neuron(-50)
 
 x = np.linspace(0,t,t)
