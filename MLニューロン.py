@@ -50,6 +50,7 @@ y.append(Nu.get_V())
 for i in range(t-1):
     y.append(Nu.calc(I))
 
+
 plt.plot(x,y,label='Test')
 plt.savefig('MLNeuron.png')
 #print(y)

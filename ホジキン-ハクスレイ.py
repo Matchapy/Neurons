@@ -6,6 +6,38 @@ Hudgkin-Huxley方程式を元に実装
 http://www.hi.is.uec.ac.jp/rcb/paper/PDF/H18_wada.pdf
 数値は上記のサイトから引用
 '''
+class Freq_Counter:
+    '''
+    閾値電圧に対する立ち下がりを検知し、周波数を測定する
+    '''
+
+    V_prev=None
+    counter=0
+    detected=[]
+
+    def __init__(self,Vthr):
+        self.Vthr=Vthr
+
+    def update(self,V):
+        if self.V_prev is None:
+            self.V_prev=V
+        elif (self.V_prev>self.Vthr and V<self.Vthr):
+            self.detected.append(self.counter)
+
+        self.V_prev=V
+        self.counter+=1
+
+    def get_Freq(self):
+        if(len(self.detected)<2):
+            print('There is not enough data.')
+            return None
+
+        diff=np.diff(self.detected)
+        T_mean=sum(diff)/len(diff)
+        freq=1/T_mean
+        return freq
+
+
 class Neuron:
     C=1
     gNa=120
@@ -63,18 +95,23 @@ class Neuron:
 #tは時間、Iは電流値[mA]
 
 t = 2000
-I = 80
+I = 120
 Nu=Neuron(-50)
+freq_counter=Freq_Counter(-10)
 
 x = np.linspace(0,t,t)
 y= []
 y.append(Nu.get_V())
 for i in range(t-1):
-    y.append(Nu.calc(I))
+    now_V=Nu.calc(I)
+    y.append(now_V)
+    freq_counter.update(now_V)
+
 
     #print(Nu.get_params())
 
 plt.plot(x,y,label='Test')
 plt.savefig('Hudgkin-Huxley.png')
+print(str(freq_counter.get_Freq())+'Hz')
 fig=plt.figure()
 #print(y)
