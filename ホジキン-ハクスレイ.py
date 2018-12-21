@@ -11,11 +11,10 @@ class Freq_Counter:
     閾値電圧に対する立ち下がりを検知し、周波数を測定する
     '''
 
-    V_prev=None
-    counter=0
-    detected=[]
-
     def __init__(self,Vthr):
+        self.V_prev=None
+        self.counter=0
+        self.detected=[]
         self.Vthr=Vthr
 
     def update(self,V):
