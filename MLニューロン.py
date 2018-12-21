@@ -1,6 +1,46 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
+class Freq_Counter:
+    '''
+    閾値電圧に対する立ち下がりを検知し、周波数を測定する
+    '''
+
+    def __init__(self,Vthr):
+        self.V_prev=None
+        self.counter=0
+        self.detected=[]
+        self.Vthr=Vthr
+
+    def update(self,V):
+        if self.V_prev is None:
+            self.V_prev=V
+        elif (self.V_prev>self.Vthr and V<self.Vthr):
+            #print(self.counter)
+            self.detected.append(self.counter)
+
+        self.V_prev=V
+        self.counter+=1
+
+    def get_Freq(self):
+        if(len(self.detected)<2):
+            print('There is not enough data.')
+            return 0
+
+        diff=np.diff(self.detected)
+        T_mean=sum(diff)/len(diff)
+        freq=1/T_mean
+        return freq
+
+def simulate(I,t):
+    neuro=Neuron(-40)
+    freq_count=Freq_Counter(0)
+    for i in range(t):
+        freq_count.update(neuro.calc(I))
+
+    return(freq_count.get_Freq())
+
+
 class Neuron:
     # Voltage:=[mV]
     # conductances:=[mS/cm2]
@@ -41,18 +81,23 @@ class Neuron:
 #tは時間、Iは電流値[mA]
 
 t = 200
-I = 200
+I = 100
 Nu=Neuron(-40)
+fc=Freq_Counter(0)
 
 x = np.linspace(0,t,t)
 y= []
 y.append(Nu.get_V())
 for i in range(t-1):
-    y.append(Nu.calc(I))
+    Vnow=Nu.calc(I)
+    fc.update(Vnow)
+    y.append(Vnow)
 
 
 plt.plot(x,y,label='Test')
-plt.savefig('MLNeuron.png')
+print(str(fc.get_Freq())+'Hz')
+print(fc.detected)
+#plt.savefig('MLNeuron.png')
 #print(y)
 
 #%%n-Vgraph
@@ -70,3 +115,15 @@ for i in range(t):
 
 plt.plot(sim_V,sim_n,label='n-V')
 plt.savefig('MLNeuron-nV.png')
+
+#%%Freq-I Graph
+
+Freqs=[]
+Is=[]
+for I in range(10,200,2):
+    #print(I)
+    Is.append(I)
+    Freqs.append(simulate(I,1000))
+
+plt.plot(Is,Freqs,label='Fq-I')
+plt.savefig('MLNeuron-FqI.png')
