@@ -36,6 +36,9 @@ class Freq_Counter:
         freq=1/T_mean
         return freq
 
+    def get_count(self):
+        return len(self.detected)
+
 
 class Neuron:
     C=1
@@ -114,3 +117,22 @@ plt.savefig('Hudgkin-Huxley.png')
 print(str(freq_counter.get_Freq())+'Hz')
 fig=plt.figure()
 #print(y)
+
+#%% Fq-Iグラフ
+def simulate(I,t):
+    Neuro=Neuron(-50)
+    fc=Freq_Counter(-20)
+    for i in range(t):
+        fc.update(Neuro.calc(I))
+    print(fc.get_count())
+    return(fc.get_Freq())
+
+Freqs=[]
+Is=[]
+for I in range(10,200,2):
+    #print(I)
+    Is.append(I)
+    Freqs.append(simulate(I,1000))
+
+plt.plot(Is,Freqs,label='Fq-I')
+plt.savefig('HH-FqI.png')
