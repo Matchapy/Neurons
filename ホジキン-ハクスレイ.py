@@ -29,7 +29,7 @@ class Freq_Counter:
     def get_Freq(self):
         if(len(self.detected)<2):
             print('There is not enough data.')
-            return None
+            return 0
 
         diff=np.diff(self.detected)
         T_mean=sum(diff)/len(diff)
@@ -97,7 +97,7 @@ class Neuron:
 #tは時間、Iは電流値[mA]
 
 t = 2000
-I = 120
+I = 80
 Nu=Neuron(-50)
 freq_counter=Freq_Counter(-10)
 
