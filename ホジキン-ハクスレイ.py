@@ -28,7 +28,7 @@ class Freq_Counter:
 
     def get_Freq(self):
         if(len(self.detected)<2):
-            print('There is not enough data.')
+            #print('There is not enough data.')
             return 0
 
         diff=np.diff(self.detected)
@@ -45,18 +45,18 @@ class Neuron:
     gNa=120
     gk=36
     gL=0.3
-    INa=1
-    Ik=1
-    IL=1
     ENa=55
     Ek=-77
     EL=-54.387
-    m=0
-    h=1
-    n=0
     delta_t=0.01
 
     def __init__(self,V0):
+        self.m=0
+        self.h=0.6
+        self.n=0.4
+        self.INa=1
+        self.Ik=1
+        self.IL=1
         self.V=V0
 
     def calc(self,I):
@@ -89,6 +89,12 @@ class Neuron:
     def get_n(self):
         return self.n
 
+    def get_h(self):
+        return self.h
+
+    def get_m(self):
+        return self.m
+
     def get_params(self):
         return 'V:'+str(self.V)+' INa:'+str(self.INa)+' Ik:'+str(self.Ik)+' IL:'+str(self.IL)+' m:'+str(self.m)+' h:'+str(self.h)+' n:'+str(self.n)
 
@@ -97,42 +103,89 @@ class Neuron:
 #tは時間、Iは電流値[mA]
 
 t = 2000
-I = 80
+t_I=500
+I = 100
 Nu=Neuron(-50)
 freq_counter=Freq_Counter(-10)
 
 x = np.linspace(0,t,t)
 y= []
+ms=[]
+hs=[]
+ns=[]
+Is=[]
+
 y.append(Nu.get_V())
+ms.append(Nu.get_m())
+hs.append(Nu.get_h())
+ns.append(Nu.get_n())
+Is.append(0)
 for i in range(t-1):
-    now_V=Nu.calc(I)
+    now_I=I
+    if (i>t_I and i<t_I+100):
+        now_I=I
+    if (i>t_I+1000 and i<t_I+1100):
+        now_I=I
+    now_V=Nu.calc(now_I)
     y.append(now_V)
+    Is.append(now_I)
+    ms.append(Nu.get_m())
+    hs.append(Nu.get_h())
+    ns.append(Nu.get_n())
+    '''
+    print('m:'+str(Nu.get_m()))
+    print('h:'+str(Nu.get_h()))
+    print('n:'+str(Nu.get_n()))
+    '''
     freq_counter.update(now_V)
-
-
     #print(Nu.get_params())
 
-plt.plot(x,y,label='Test')
-plt.savefig('Hudgkin-Huxley.png')
+fig,(ax_I,ax_V,ax_param)=plt.subplots(3,1)
+fig.set_figheight(15)
+fig.set_figwidth(7)
+ax_V.plot(x,y,label='V')
+ax_V.set_xlabel('Time')
+ax_V.set_ylabel('Voltage')
+ax_V.legend()
+#plt.savefig('Hudgkin-Huxley.png')
 print(str(freq_counter.get_Freq())+'Hz')
-fig=plt.figure()
+#plt.clf()
+ax_I.plot(x,Is,label='I')
+ax_I.set_xlabel('Time')
+ax_I.set_ylabel('Input current')
+ax_I.legend()
+#plt.savefig('HH-It.png')
+#plt.clf()
+ax_param.plot(x,ms,label='m')
+#plt.savefig('HH-mt.png')
+#plt.clf()
+ax_param.plot(x,hs,label='h')
+#plt.savefig('HH-ht.png')
+#plt.clf()
+ax_param.plot(x,ns,label='n')
+ax_param.set_xlabel('Time')
+ax_param.set_ylabel('Gates')
+ax_param.set_ylim(0,1.5)
+ax_param.legend()
+plt.show()
+fig.savefig('HH.png')
 #print(y)
 
 #%% Fq-Iグラフ
 def simulate(I,t):
     Neuro=Neuron(-50)
-    fc=Freq_Counter(-20)
+    fc=Freq_Counter(-10)
     for i in range(t):
         fc.update(Neuro.calc(I))
-    print(fc.get_count())
+    #print(fc.get_count())
     return(fc.get_Freq())
 
 Freqs=[]
 Is=[]
-for I in range(10,200,2):
+for I in range(0,200,2):
     #print(I)
     Is.append(I)
-    Freqs.append(simulate(I,1000))
+    Freqs.append(simulate(I,3000))
 
 plt.plot(Is,Freqs,label='Fq-I')
 plt.savefig('HH-FqI.png')
